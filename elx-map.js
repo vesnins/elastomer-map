@@ -12,7 +12,7 @@ var D={"cities":{"Владикавказ":[85.4,537.6,"North Ossetia"],"Улан
 var root=document.getElementById('elx-map'),
     dots=document.getElementById('elx-dots'),tip=document.getElementById('elx-tip'),
     wrap=root.querySelector('.elx-wrap'),regs=root.querySelectorAll('#elx-regions path,#elx-countries path'),
-    cat='',by={},pin=null,cur=null,mapKeys=[],svg=root.querySelector('svg');
+    cat='',by={},pin=null,mapKeys=[],svg=root.querySelector('svg');
 
 function word(n,a,b,c){var m=Math.abs(n)%100,m1=m%10;if(m>10&&m<20)return c;if(m1>1&&m1<5)return b;if(m1===1)return a;return c;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -82,7 +82,7 @@ function bar(){
   tr.style.display='block';
   tr.firstChild.style.height=Math.round(sc.scrollTop/max*100)+'%';
 }
-function unpin(){pin=null;over=null;tip.classList.remove('show','pin');hi(cur);}
+function unpin(){pin=null;over=null;tip.classList.remove('show','pin');hi(null);}
 /* точка под курсором: ближайший центр кружка (маленькие не перекрывают большие) */
 function pick(e){
   var m=svg.getScreenCTM();if(!m)return null;
@@ -96,13 +96,13 @@ var over=null;
 svg.addEventListener('mousemove',function(e){
   var k=pick(e);svg.style.cursor=k?'pointer':'';
   if(pin||k===over)return;over=k;
-  if(k){showTip(k,false);hi(k);}else{tip.classList.remove('show');hi(cur);}
+  if(k){showTip(k,false);hi(k);}else{tip.classList.remove('show');hi(null);}
 });
-svg.addEventListener('mouseleave',function(){over=null;svg.style.cursor='';if(pin)return;tip.classList.remove('show');hi(cur);});
+svg.addEventListener('mouseleave',function(){over=null;svg.style.cursor='';if(pin)return;tip.classList.remove('show');hi(null);});
 svg.addEventListener('click',function(e){
   var k=pick(e);if(!k)return;
   if(pin===k){unpin();return;}
-  cur=k;pin=k;over=k;hi(k);showTip(k,true);
+  pin=k;over=k;hi(k);showTip(k,true);
 });
 tip.addEventListener('scroll',bar,true);
 tip.addEventListener('click',function(e){if(e.target.closest('.elx-x'))unpin();});
@@ -117,7 +117,7 @@ root.querySelectorAll('.elx-f').forEach(function(b){
   b.addEventListener('click',function(){
     root.querySelectorAll('.elx-f').forEach(function(x){x.setAttribute('aria-pressed','false');});
     b.setAttribute('aria-pressed','true');cat=b.getAttribute('data-cat');
-    pin=null;cur=null;tip.classList.remove('show','pin');build();
+    pin=null;tip.classList.remove('show','pin');build();
   });
 });
 build();
